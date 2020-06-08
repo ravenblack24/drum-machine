@@ -1,17 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faToggleOn } from '@fortawesome/free-solid-svg-icons';
-import { faToggleOff } from '@fortawesome/free-solid-svg-icons';
+
+const url = "https://s3.amazonaws.com/freecodecamp/drums/";
+const mapping = {
+	"Q": "Heater-1",
+	"W": "Heater-2",
+	"E": "Heater-3",
+	"A": "Kick_n_Hat",
+	"S": "Give_us_a_light",
+	"D": "Dry_Ohh",
+	"Z": "punchy_kick_1",
+	"X": "Heater-6",
+	"C": "side_stick_1"
+}
 
 class RangeInput extends React.Component {
-	constructor(props) {
-		super(props);
-	}
 	render() {
 		return (
-			<input type="range" min="1" max="100" value={this.props.volume} onChange={this.props.changeHandler} className="rangeInput"/>
+			<input type="range" min="0" max="1" step="0.1" value={this.props.volume} onChange={this.props.changeHandler} className="rangeInput"/>
 		);
 	}
 }
@@ -19,8 +26,8 @@ class RangeInput extends React.Component {
 class Toggle extends React.Component {
 	render() {
 		return (
-			<label className="switch">
-				<input type="checkbox" />
+			<label className="switch" >
+				<input type="checkbox" checked={this.props.checked} onChange={this.props.changeHandler}/>
 				<span className="slider round"></span>
 			</label>
 		);
@@ -28,11 +35,24 @@ class Toggle extends React.Component {
 }
 
 class DrumPad extends React.Component{
+	constructor(props) {
+		super(props);
+		this.audio = React.createRef();
+		this.playAudio = this.playAudio.bind(this);
+	}
+
+	playAudio() {
+		this.audio.current.play();
+		this.audio.current.volume = this.props.volume;
+		this.props.onClick(this.props.value);
+		this.audio.current.currentTime = 0;
+	}
+
 	render() {
 		return(
-			<button className="drum-pad" id={this.props.id}>
+			<button className="drum-pad" id={this.props.id} onClick={this.playAudio} >
 				{this.props.value}
-				<audio ref={this.props.ref} id={this.props.value} src={this.props.src} className="clip" />
+				<audio ref={this.audio} id={this.props.value} src={this.props.src} className="clip" />
 			</button>
 		);
 	}
@@ -42,44 +62,53 @@ class DrumMachine extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			volume: 20,
+			volume: 0.5,
 			power: true,
-			bank: true
+			bank: false,
+			display: ""
 		}
 		this.changeVolume = this.changeVolume.bind(this);
+		this.togglePower = this.togglePower.bind(this);
+		this.updateDisplay = this.updateDisplay.bind(this);
+		console.log(this.hi);
 	}
 	changeVolume(e) {
 		this.setState({ volume: e.target.value});
+	}
+
+	togglePower() {
+		const pwr = this.state.power;
+		this.setState({
+			power: !pwr
+		});
+	}
+
+	updateDisplay(key) {
+		const regex = /-|_/g;
+		const trackTitle = mapping[key].replace(regex , " ");
+		this.setState({
+			display: trackTitle
+		})	
 	}
 
 	render() {
 		return (
 			<div className="container">
 				<div className="drumpad-container">
-					<DrumPad id={"SoundQ"} value={"Q"} src={"C:/Users/Karen/Documents/version-control/sounds/ching_gamelan.mp3"} />
-					<DrumPad id={"SoundW"} value={"W"} src={"https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/success.mp3"} />
-					<DrumPad id={"SoundE"} value={"E"} src={"https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/success.mp3"} />
-					<DrumPad id={"SoundA"} value={"A"} src={"https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/success.mp3"} />
-					<DrumPad id={"SoundS"} value={"S"} src={"https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/success.mp3"} />
-					<DrumPad id={"SoundD"} value={"D"} src={"https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/success.mp3"} />
-					<DrumPad id={"SoundZ"} value={"Z"} src={"https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/success.mp3"} />
-					<DrumPad id={"SoundX"} value={"X"} src={"https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/success.mp3"} />
-					<DrumPad id={"SoundC"} value={"C"} src={"https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/success.mp3"} />
+					{Object.keys(mapping).map((item, i) => (
+						<DrumPad id={"sound".concat(item)} key={i} value={item} src={url.concat(mapping[item]).concat(".mp3")} volume={this.state.volume} onClick={this.updateDisplay} />
+					))}
 				</div>
 				<div id="control-container">
 					<div id="powerBar">
 						<div className="label">Power</div>
-						<Toggle />
+						<Toggle changeHandler={this.togglePower} checked={this.state.power}/>
 					</div>
 					<div id="displayBar">
-						<div id="display">test</div>
+						<div id="display">{this.state.display}</div>
 					</div>
 					<div id="volumeBar">
 						<RangeInput changeHandler={this.changeVolume} volume={this.state.volume}/>
-					</div>
-					<div id="bankBar">
-						<div className="label">Bank</div>
-						<Toggle />
 					</div>
 				</div>
 			</div>
