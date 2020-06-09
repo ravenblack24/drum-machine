@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import ReactFCCtest from 'react-fcctest';
+import {Helmet} from "react-helmet";
 
 const url = "https://s3.amazonaws.com/freecodecamp/drums/";
 const mapping = {
@@ -108,26 +109,33 @@ class DrumMachine extends React.Component {
 
 	render() {
 		return (
-			<div className={!this.state.power ? `container-disabled container`: `container`} id="drum-machine">
-				<div className="drumpad-container">
-					{Object.keys(mapping).map((item, i) => (
-						<DrumPad id={"sound".concat(item)} key={i} value={item} src={url.concat(mapping[item]).concat(".mp3")} volume={this.state.volume} onPlay={this.updateDisplay} disabled={!this.state.power}/>
-					))}
-				</div>
-				<div id="control-container">
-					<div id="powerBar">
-						<div className="label">Power</div>
-						<Toggle changeHandler={this.togglePower} checked={this.state.power}/>
+			<React.Fragment>
+				<Helmet>
+	            	<meta charSet="utf-8" />
+	            	<title>ReactJS - Drum Machine</title>
+	            	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	        	</Helmet>
+				<div className={!this.state.power ? `container-disabled container`: `container`} id="drum-machine">
+					<div className="drumpad-container">
+						{Object.keys(mapping).map((item, i) => (
+							<DrumPad id={"sound".concat(item)} key={i} value={item} src={url.concat(mapping[item]).concat(".mp3")} volume={this.state.volume} onPlay={this.updateDisplay} disabled={!this.state.power}/>
+						))}
 					</div>
-					<div id="displayBar">
-						<div id="display">{this.state.display}</div>
+					<div id="control-container">
+						<div id="powerBar">
+							<div className="label">Power</div>
+							<Toggle changeHandler={this.togglePower} checked={this.state.power}/>
+						</div>
+						<div id="displayBar">
+							<div id="display">{this.state.display}</div>
+						</div>
+						<div id="volumeBar">
+							<RangeInput changeHandler={this.changeVolume} volume={this.state.volume} disabled={!this.state.power}/>
+						</div>
 					</div>
-					<div id="volumeBar">
-						<RangeInput changeHandler={this.changeVolume} volume={this.state.volume} disabled={!this.state.power}/>
-					</div>
-				</div>
-				<ReactFCCtest />
-			</div>	
+					<ReactFCCtest />
+				</div>	
+			</React.Fragment>
 		);
 	}
 }
