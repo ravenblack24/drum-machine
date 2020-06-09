@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import ReactFCCtest from 'react-fcctest';
 
 const url = "https://s3.amazonaws.com/freecodecamp/drums/";
 const mapping = {
@@ -107,7 +108,7 @@ class DrumMachine extends React.Component {
 
 	render() {
 		return (
-			<div className={!this.state.power ? `container-disabled container`: `container`}>
+			<div className={!this.state.power ? `container-disabled container`: `container`} id="drum-machine">
 				<div className="drumpad-container">
 					{Object.keys(mapping).map((item, i) => (
 						<DrumPad id={"sound".concat(item)} key={i} value={item} src={url.concat(mapping[item]).concat(".mp3")} volume={this.state.volume} onPlay={this.updateDisplay} disabled={!this.state.power}/>
@@ -125,7 +126,8 @@ class DrumMachine extends React.Component {
 						<RangeInput changeHandler={this.changeVolume} volume={this.state.volume} disabled={!this.state.power}/>
 					</div>
 				</div>
-			</div>
+				<ReactFCCtest />
+			</div>	
 		);
 	}
 }
