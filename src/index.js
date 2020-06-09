@@ -18,7 +18,7 @@ const mapping = {
 class RangeInput extends React.Component {
 	render() {
 		return (
-			<input type="range" min="0" max="1" step="0.1" value={this.props.volume} onChange={this.props.changeHandler} className="rangeInput"/>
+			<input type="range" min="0" max="1" step="0.1" value={this.props.volume} onChange={this.props.changeHandler} className="rangeInput" disabled={this.props.disabled}/>
 		);
 	}
 }
@@ -39,18 +39,32 @@ class DrumPad extends React.Component{
 		super(props);
 		this.audio = React.createRef();
 		this.playAudio = this.playAudio.bind(this);
+		this.handleKeyPress = this.handleKeyPress.bind(this);
+	}
+
+	componentDidMount(){
+		document.addEventListener("keydown", this.handleKeyPress, false);
+	}
+	componentWillUnmount(){
+		document.removeEventListener("keydown", this.handleKeyPress, false);
 	}
 
 	playAudio() {
 		this.audio.current.play();
 		this.audio.current.volume = this.props.volume;
-		this.props.onClick(this.props.value);
+		this.props.onPlay(this.props.value);
 		this.audio.current.currentTime = 0;
+	}
+
+	handleKeyPress(event) {
+		if(event.key.toUpperCase() === this.props.value) {
+			this.playAudio();
+		}
 	}
 
 	render() {
 		return(
-			<button className="drum-pad" id={this.props.id} onClick={this.playAudio} >
+			<button className="drum-pad" id={this.props.id} onClick={this.playAudio} onKeyDown={this.handleKeyPress} disabled={this.props.disabled}>
 				{this.props.value}
 				<audio ref={this.audio} id={this.props.value} src={this.props.src} className="clip" />
 			</button>
@@ -64,14 +78,14 @@ class DrumMachine extends React.Component {
 		this.state = {
 			volume: 0.5,
 			power: true,
-			bank: false,
 			display: ""
 		}
 		this.changeVolume = this.changeVolume.bind(this);
 		this.togglePower = this.togglePower.bind(this);
 		this.updateDisplay = this.updateDisplay.bind(this);
-		console.log(this.hi);
+
 	}
+
 	changeVolume(e) {
 		this.setState({ volume: e.target.value});
 	}
@@ -82,7 +96,7 @@ class DrumMachine extends React.Component {
 			power: !pwr
 		});
 	}
-
+	
 	updateDisplay(key) {
 		const regex = /-|_/g;
 		const trackTitle = mapping[key].replace(regex , " ");
@@ -93,10 +107,10 @@ class DrumMachine extends React.Component {
 
 	render() {
 		return (
-			<div className="container">
+			<div className={!this.state.power ? `container-disabled container`: `container`}>
 				<div className="drumpad-container">
 					{Object.keys(mapping).map((item, i) => (
-						<DrumPad id={"sound".concat(item)} key={i} value={item} src={url.concat(mapping[item]).concat(".mp3")} volume={this.state.volume} onClick={this.updateDisplay} />
+						<DrumPad id={"sound".concat(item)} key={i} value={item} src={url.concat(mapping[item]).concat(".mp3")} volume={this.state.volume} onPlay={this.updateDisplay} disabled={!this.state.power}/>
 					))}
 				</div>
 				<div id="control-container">
@@ -108,7 +122,7 @@ class DrumMachine extends React.Component {
 						<div id="display">{this.state.display}</div>
 					</div>
 					<div id="volumeBar">
-						<RangeInput changeHandler={this.changeVolume} volume={this.state.volume}/>
+						<RangeInput changeHandler={this.changeVolume} volume={this.state.volume} disabled={!this.state.power}/>
 					</div>
 				</div>
 			</div>
