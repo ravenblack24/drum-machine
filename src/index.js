@@ -42,6 +42,9 @@ class DrumPad extends React.Component{
 		this.audio = React.createRef();
 		this.playAudio = this.playAudio.bind(this);
 		this.handleKeyPress = this.handleKeyPress.bind(this);
+		this.state = {
+			activeStyle: ""
+		}
 	}
 
 	componentDidMount(){
@@ -56,17 +59,27 @@ class DrumPad extends React.Component{
 		this.audio.current.volume = this.props.volume;
 		this.props.onPlay(this.props.value);
 		this.audio.current.currentTime = 0;
+
 	}
 
 	handleKeyPress(event) {
 		if(event.key.toUpperCase() === this.props.value) {
+			this.setState({
+				activeStyle: " drum-pad--active"
+			});
 			this.playAudio();
+			setTimeout(() => {
+				this.setState({
+					activeStyle: ""
+				})
+			}, 100);
 		}
 	}
 
 	render() {
+
 		return(
-			<button className="drum-pad" id={this.props.id} onClick={this.playAudio} onKeyDown={this.handleKeyPress} disabled={this.props.disabled}>
+			<button className={"drum-pad" +this.state.activeStyle} id={this.props.id} onClick={this.playAudio} onKeyDown={this.handleKeyPress} disabled={this.props.disabled}>
 				{this.props.value}
 				<audio ref={this.audio} id={this.props.value} src={this.props.src} className="clip" />
 			</button>
