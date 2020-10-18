@@ -17,6 +17,9 @@ const mapping = {
 	"C": "side_stick_1"
 }
 
+/**
+ * Description of component purpose
+ */
 export default class DrumMachine extends React.Component {
 	constructor(props) {
 		super(props);
@@ -30,6 +33,13 @@ export default class DrumMachine extends React.Component {
 		this.updateDisplay = this.updateDisplay.bind(this);
 	}
 
+	/**
+	 * Description
+	 * 
+	 * @param e 
+	 * 
+	 * @returns void
+	 */
 	changeVolume(e) {
 		this.setState({ volume: e.target.value});
 	}
@@ -57,6 +67,7 @@ export default class DrumMachine extends React.Component {
 	            	<title>Drum Machine - React js app</title>
 	            	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 	        	</Helmet>
+				<a href="https://github.com/ravenblack24/drum-machine"><img loading="lazy" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_left_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"/></a>
 				<div className={!this.state.power ? `container-disabled container`: `container`} id="drum-machine">
 					<div className="drumpad-container">
 						{Object.keys(mapping).map((item, i) => (

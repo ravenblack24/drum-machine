@@ -1,5 +1,8 @@
 import React from 'react';
 
+/**
+ * Switch power on/off
+ */
 export default class Toggle extends React.Component {
 	render() {
 		return (
